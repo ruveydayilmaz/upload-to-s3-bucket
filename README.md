@@ -39,7 +39,7 @@ npm start
 
 | Param     | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `file`    | `file`   | **Important**. Request bodys must be a form data |
+| `file`    | `file`   | **Important**. Request body must be a form data |
 
 #### Upload zip file
 
@@ -49,7 +49,7 @@ npm start
 
 | Param     | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `file`    | `file`   | **Important**. Request bodys must be a form data |
+| `file`    | `file`   | **Important**. Request body must be a form data |
 
 #### Upload video file with Multipart
 
@@ -59,7 +59,7 @@ npm start
 
 | Param     | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `file`    | `file`   | **Important**. Request bodys must be a form data |  
+| `file`    | `file`   | **Important**. Request body must be a form data |  
  
 ## Environment Variables  
 To run this project, you will need to add the following environment variables to your .env file  
