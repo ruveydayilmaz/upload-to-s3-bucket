@@ -8,12 +8,13 @@ const JSZip = require("jszip");
 const AWS = require("aws-sdk");
 
 AWS.config.loadFromPath('./aws-config.json');
-AWS.config.httpOptions.timeout = 300000; 
+AWS.config.httpOptions.timeout = 300000; // I added this line to increase the timeout because I was getting a timeout error
 var s3 = new AWS.S3();
 
 const {
   uploadAudio,
   uploadZip,
+  uploadImage
 } = require("./aws");
 
 const app = express();
@@ -24,33 +25,48 @@ app.use(express.urlencoded({ extended: false }));
 const cors = require("cors");
 
 app.use(
-  cors({
+  cors({ // allow cross-origin requests
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: [
       "Content-Type",
       "Authorization",
-      "ETag"
+      "ETag" // expose the ETag header
     ],
   })
 );
 
-app.post("/upload", upload.single("file"), async (req, res) => {
-  const filename = "holdmeinyourarms.mp3";
+app.post("/upload-audio", upload.single("file"), async (req, res) => {
+  // generate a random file name
+  const filename = Date.now() + "-" + Math.random().toString(36).substring(7) + ".mp3";
   const file = req.file.buffer;
 
   const link = await uploadAudio(filename, file);
   res.send(link);
 });
 
-app.post("/upload-video", upload.single("file"), async (req, res) => {  // inspired by https://github.com/sevastos's multipart upload example
+
+app.post("/upload-image", upload.single("file"), async (req, res) => {
+  // generate a random file name
+  const filename = Date.now() + "-" + Math.random().toString(36).substring(7) + ".jpg";
+  const file = req.file.buffer;
+
+  const link = await uploadImage(filename, file);
+  res.send(link);
+});
+
+
+// uploading a large file is a little more complicated. 
+// 1) First, we need to split the file into chunks and upload each chunk separately. 
+// 2) We also need to keep track of the chunks we've uploaded so we can reassemble them after all the chunks have been uploaded.
+// 3) The way we keep track of the chunks is by getting the ETag from the response of each chunk upload. And then give those ETags to the completeMultipartUpload function.
+app.post("/upload-video", upload.single("file"), async (req, res) => {  // heavely inspired by https://github.com/sevastos's multipart upload example
   
   var fileName = Date.now() + Math.random().toString(36).substring(7) + ".mp4";
   var fileKey = fileName;
   var buffer = req.file.buffer;
   
-  var startTime = new Date();
   var partNum = 0;
   var partSize = 1024 * 1024 * 5;
   var numPartsLeft = Math.ceil(buffer.length / partSize);
@@ -139,15 +155,16 @@ app.post("/upload-video", upload.single("file"), async (req, res) => {  // inspi
 app.post("/upload-zip", upload.single("file"), async (req, res) => {
   const zip = new JSZip();
 
-  const filename = "video.zip";
+  const filename = Date.now() + "-" + Math.random().toString(36).substring(7) + ".zip";
 
-  zip.file("video", req.file.buffer);
+  zip.file(filename, req.file.buffer);
 
   const content = await zip.generateAsync({ type: "nodebuffer" });
 
   const link = await uploadZip(filename, content);
   res.send(link);
 });
+
 
 app.post("/unzip", upload.single("file"), async (req, res) => {
   // in progress

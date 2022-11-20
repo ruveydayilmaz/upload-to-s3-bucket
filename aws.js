@@ -26,7 +26,29 @@ const uploadAudio = (filename, file) => {
     })
 }
 
-// first zip the file, then upload it to s3
+// upload a single image file to s3
+const uploadImage = (filename, file) => {
+
+    return new Promise((resolve, reject) => {
+        const params = {
+            Key: filename,
+            Bucket: process.env.bucket,
+            Body: file,
+            ContentType: 'image/jpeg' || 'image/png',
+            ACL: 'public-read'
+        }
+
+        s3.upload(params, (err, data) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(data.Location)
+            }
+        })
+    })
+}
+
+// upload a single zip file to s3
 const uploadZip = (filename, file) => {
 
     return new Promise((resolve, reject) => {
@@ -50,6 +72,7 @@ const uploadZip = (filename, file) => {
 
 module.exports = {
     uploadAudio,
+    uploadImage,
     uploadZip
 }
 
