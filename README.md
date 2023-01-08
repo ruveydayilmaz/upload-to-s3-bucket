@@ -34,7 +34,7 @@ npm start
 #### Upload audio file
 
 ~~~http
-  POST /upload
+  POST /upload-audio
 ~~~  
 
 | Param     | Type     | Description                |
@@ -45,6 +45,17 @@ npm start
 
 ~~~http
   POST /upload-zip
+~~~
+
+| Param     | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `file`    | `file`   | **Important**. Request body must be a form data |
+
+
+#### Upload image file
+
+~~~http
+  POST /upload-image
 ~~~
 
 | Param     | Type     | Description                |
